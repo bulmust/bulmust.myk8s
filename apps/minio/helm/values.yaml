@@ -1,0 +1,58 @@
+mode: standalone
+rootUser: bulmustAdmin
+rootPassword: bulmustbulmust
+persistence:
+  enabled: true
+  #storageClass: local-path
+  size: 10Gi
+consoleIngress:
+  enabled: true
+  ingressClassName: nginx
+  #path: /
+  hosts:
+    - loki-minio-console.localhost
+  tls:
+    - secretName: loki-minio-console-tls
+      hosts:
+        - loki-minio-console.localhost
+# resources:
+#   limits:
+#     memory: 5800Mi
+#   requests:
+#     cpu: 200m
+#     memory: 1400Mi
+users:
+  - accessKey: bulmust
+    secretKey: bulmustbulmust
+    policy: readwrite
+buckets:
+  - name: loki-boltdb-shipper
+    policy: none
+    purge: false
+    versioning: true
+serviceAccount:
+  name: minio-sa-loki
+resources:
+  requests:
+    memory: 1Gi
+# metrics:
+#   serviceMonitor:
+#     additionalLabels:
+#       release: p8s-stack
+#     enabled: true
+# For Tainted Nodes
+# tolerations:
+#   - key: "product"
+#     operator: "Equal"
+#     value: "monitoring"
+#     effect: "NoSchedule"
+# nodeSelector:
+#   role: monitoring
+# postJob:
+#   tolerations:
+#     - key: "product"
+#       operator: "Equal"
+#       value: "monitoring"
+#       effect: "NoSchedule"
+#   nodeSelector:
+#     role: monitoring

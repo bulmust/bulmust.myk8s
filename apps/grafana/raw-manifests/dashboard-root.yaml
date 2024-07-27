@@ -1,0 +1,882 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashboards-root-node-resources
+  #* This label is required for the sidecar to pick up the dashboard
+  labels:
+    grafana_dashboard: "load"
+data:
+  dashboards-root-node-resources.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 55,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "color": "red",
+                      "index": 1,
+                      "text": "DOWN"
+                    },
+                    "1": {
+                      "color": "dark-green",
+                      "index": 0,
+                      "text": "UP"
+                    }
+                  },
+                  "type": "value"
+                }
+              ]
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 12,
+          "options": {
+            "autoSizeColumns": true,
+            "autoSizePolygons": true,
+            "autoSizeRows": true,
+            "compositeConfig": {
+              "animationSpeed": "1500",
+              "composites": [],
+              "enabled": true
+            },
+            "compositeGlobalAliasingEnabled": false,
+            "ellipseCharacters": 18,
+            "ellipseEnabled": false,
+            "globalAutoScaleFonts": true,
+            "globalClickthrough": "",
+            "globalClickthroughCustomTarget": "",
+            "globalClickthroughCustomTargetEnabled": false,
+            "globalClickthroughNewTabEnabled": true,
+            "globalClickthroughSanitizedEnabled": true,
+            "globalDecimals": 2,
+            "globalDisplayMode": "all",
+            "globalDisplayTextTriggeredEmpty": "OK",
+            "globalFillColor": "rgba(10, 85, 161, 1)",
+            "globalFontSize": 12,
+            "globalGradientsEnabled": true,
+            "globalOperator": "mean",
+            "globalPolygonBorderColor": "rgba(0, 0, 0, 0)",
+            "globalPolygonBorderSize": 2,
+            "globalPolygonSize": 25,
+            "globalRegexPattern": "",
+            "globalShape": "hexagon_pointed_top",
+            "globalShowTimestampEnabled": false,
+            "globalShowTimestampFontSize": 12,
+            "globalShowTimestampFormat": "YYYY-MM-DD HH:mm:ss",
+            "globalShowTimestampPosition": "below_value",
+            "globalShowTimestampYOffset": 0,
+            "globalShowTooltipColumnHeadersEnabled": true,
+            "globalShowValueEnabled": true,
+            "globalTextFontAutoColorEnabled": true,
+            "globalTextFontColor": "#000000",
+            "globalTextFontFamily": "Arial",
+            "globalThresholdsConfig": [],
+            "globalTooltipsEnabled": true,
+            "globalTooltipsFontFamily": "Roboto",
+            "globalTooltipsShowTimestampEnabled": true,
+            "globalUnitFormat": "short",
+            "layoutDisplayLimit": 100,
+            "layoutNumColumns": 8,
+            "layoutNumRows": 8,
+            "overrideConfig": {
+              "overrides": []
+            },
+            "sortByDirection": 1,
+            "sortByField": "name",
+            "tooltipDisplayMode": "all",
+            "tooltipDisplayTextTriggeredEmpty": "OK",
+            "tooltipPrimarySortByField": "thresholdLevel",
+            "tooltipPrimarySortDirection": 1,
+            "tooltipSecondarySortByField": "value",
+            "tooltipSecondarySortDirection": 1
+          },
+          "pluginVersion": "2.1.10",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "metrics-all"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": false,
+              "expr": "up{job=\"apiserver\"}",
+              "format": "time_series",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{cluster}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            },
+            {
+              "columns": [],
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "json"
+              },
+              "filters": [],
+              "format": "table",
+              "global_query_id": "",
+              "hide": false,
+              "refId": "B",
+              "root_selector": "clusters",
+              "source": "url",
+              "type": "json",
+              "url": "https://raw.githubusercontent.com/bulmust/myk8s/main/helmInstall/monitoring/grafana/clusters-all.json",
+              "url_options": {
+                "body_content_type": "text/plain",
+                "body_type": "raw",
+                "data": "",
+                "headers": [],
+                "method": "GET",
+                "params": []
+              }
+            }
+          ],
+          "title": "Cluster Status",
+          "type": "grafana-polystat-panel"
+        },
+        {
+          "collapsed": true,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 8
+          },
+          "id": 8,
+          "panels": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "metrics-all"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "decimals": 0,
+                  "fieldMinMax": false,
+                  "mappings": [],
+                  "min": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "unit": "Weeks"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 14,
+                "w": 8,
+                "x": 0,
+                "y": 17
+              },
+              "id": 9,
+              "options": {
+                "displayMode": "basic",
+                "maxVizHeight": 24,
+                "minVizHeight": 17,
+                "minVizWidth": 11,
+                "namePlacement": "left",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showUnfilled": false,
+                "sizing": "manual",
+                "text": {
+                  "titleSize": 11
+                },
+                "valueMode": "color"
+              },
+              "pluginVersion": "11.0.0",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "metrics-all"
+                  },
+                  "disableTextWrap": false,
+                  "editorMode": "code",
+                  "exemplar": false,
+                  "expr": "((time() - node_boot_time_seconds{cluster=\"$cluster\"})/60/60/24/7) * on(instance) group_left(nodename) (node_uname_info)",
+                  "format": "time_series",
+                  "fullMetaSearch": false,
+                  "includeNullMetadata": true,
+                  "instant": true,
+                  "interval": "",
+                  "legendFormat": "{{nodename}}",
+                  "range": false,
+                  "refId": "A",
+                  "useBackend": false
+                }
+              ],
+              "title": "Uptime",
+              "type": "bargauge"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "metrics-all"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "decimals": 0,
+                  "fieldMinMax": false,
+                  "mappings": [],
+                  "min": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "unit": "none"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 14,
+                "w": 8,
+                "x": 8,
+                "y": 17
+              },
+              "id": 10,
+              "options": {
+                "displayMode": "basic",
+                "maxVizHeight": 24,
+                "minVizHeight": 17,
+                "minVizWidth": 11,
+                "namePlacement": "left",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showUnfilled": false,
+                "sizing": "manual",
+                "text": {
+                  "titleSize": 11
+                },
+                "valueMode": "color"
+              },
+              "pluginVersion": "11.0.0",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "metrics-all"
+                  },
+                  "disableTextWrap": false,
+                  "editorMode": "code",
+                  "exemplar": false,
+                  "expr": "(count by(instance) (node_cpu_seconds_total{cluster=\"$cluster\", mode=\"system\"})) * on(instance) group_left(nodename) (node_uname_info)",
+                  "format": "time_series",
+                  "fullMetaSearch": false,
+                  "includeNullMetadata": true,
+                  "instant": true,
+                  "interval": "",
+                  "legendFormat": "{{nodename}}",
+                  "range": false,
+                  "refId": "A",
+                  "useBackend": false
+                }
+              ],
+              "title": "CPU Cores",
+              "type": "bargauge"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "metrics-all"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "decimals": 0,
+                  "fieldMinMax": false,
+                  "mappings": [],
+                  "min": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "unit": "bytes"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 14,
+                "w": 8,
+                "x": 16,
+                "y": 17
+              },
+              "id": 11,
+              "options": {
+                "displayMode": "basic",
+                "maxVizHeight": 24,
+                "minVizHeight": 8,
+                "minVizWidth": 11,
+                "namePlacement": "left",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showUnfilled": false,
+                "sizing": "manual",
+                "text": {
+                  "titleSize": 11
+                },
+                "valueMode": "color"
+              },
+              "pluginVersion": "11.0.0",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "metrics-all"
+                  },
+                  "disableTextWrap": false,
+                  "editorMode": "code",
+                  "exemplar": false,
+                  "expr": "(sum by(instance) (node_memory_MemTotal_bytes{cluster=\"$cluster\"})) * on(instance) group_left(nodename) (node_uname_info)",
+                  "format": "time_series",
+                  "fullMetaSearch": false,
+                  "includeNullMetadata": true,
+                  "instant": true,
+                  "interval": "",
+                  "legendFormat": "{{nodename}}",
+                  "range": false,
+                  "refId": "A",
+                  "useBackend": false
+                }
+              ],
+              "title": "Memory (RAM)",
+              "type": "bargauge"
+            }
+          ],
+          "title": "Summary -  $cluster",
+          "type": "row"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 9
+          },
+          "id": 6,
+          "panels": [],
+          "title": "CPU - $cluster",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "metrics-all"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 10
+          },
+          "id": 2,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "maxHeight": 600,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "10.2.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "metrics-all"
+              },
+              "disableTextWrap": false,
+              "editorMode": "code",
+              "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\", cluster=\"$cluster\"}[1m]) * 100) * on(instance) group_left(nodename) (node_uname_info{cluster=\"$cluster\"}))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{nodename}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "CPU",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "metrics-all"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 90
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 10
+          },
+          "id": 5,
+          "options": {
+            "displayMode": "lcd",
+            "maxVizHeight": 22,
+            "minVizHeight": 7,
+            "minVizWidth": 75,
+            "namePlacement": "left",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": true,
+            "sizing": "manual",
+            "text": {
+              "titleSize": 11
+            },
+            "valueMode": "color"
+          },
+          "pluginVersion": "11.0.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "metrics-all"
+              },
+              "disableTextWrap": false,
+              "editorMode": "code",
+              "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\", cluster=\"$cluster\"}[1m]) * 100) * on(instance) group_left(nodename) (node_uname_info{cluster=\"$cluster\"}))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{nodename}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "CPU (Last)",
+          "type": "bargauge"
+        },
+        {
+          "collapsed": true,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 17
+          },
+          "id": 7,
+          "panels": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "metrics-all"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green"
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 70
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "percent"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 0,
+                "y": 19
+              },
+              "id": 3,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "maxHeight": 600,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "10.2.3",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "metrics-all"
+                  },
+                  "disableTextWrap": false,
+                  "editorMode": "code",
+                  "expr": "(100 * (1 - ((avg_over_time(node_memory_MemFree_bytes{cluster=\"$cluster\"}[1m]) + avg_over_time(node_memory_Cached_bytes{cluster=\"$cluster\"}[1m]) + avg_over_time(node_memory_Buffers_bytes{cluster=\"$cluster\"}[1m])) / avg_over_time(node_memory_MemTotal_bytes{cluster=\"$cluster\"}[1m])))) * on(instance) group_left(nodename) (node_uname_info)",
+                  "fullMetaSearch": false,
+                  "includeNullMetadata": true,
+                  "instant": false,
+                  "legendFormat": "{{nodename}}",
+                  "range": true,
+                  "refId": "A",
+                  "useBackend": false
+                }
+              ],
+              "title": "Memory (Avareged 1m)",
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "metrics-all"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "mappings": [],
+                  "max": 100,
+                  "min": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green"
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 70
+                      },
+                      {
+                        "color": "red",
+                        "value": 90
+                      }
+                    ]
+                  },
+                  "unit": "percent"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 7,
+                "w": 12,
+                "x": 12,
+                "y": 19
+              },
+              "id": 4,
+              "options": {
+                "displayMode": "lcd",
+                "maxVizHeight": 22,
+                "minVizHeight": 7,
+                "minVizWidth": 75,
+                "namePlacement": "left",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showUnfilled": true,
+                "sizing": "manual",
+                "text": {
+                  "titleSize": 11
+                },
+                "valueMode": "color"
+              },
+              "pluginVersion": "11.0.0",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "metrics-all"
+                  },
+                  "disableTextWrap": false,
+                  "editorMode": "code",
+                  "expr": "(100 * (1 - ((avg_over_time(node_memory_MemFree_bytes{cluster=\"$cluster\"}[15s]) + avg_over_time(node_memory_Cached_bytes{cluster=\"$cluster\"}[15s]) + avg_over_time(node_memory_Buffers_bytes{cluster=\"$cluster\"}[15s])) / avg_over_time(node_memory_MemTotal_bytes{cluster=\"$cluster\"}[15s])))) * on(instance) group_left(nodename) (node_uname_info)",
+                  "fullMetaSearch": false,
+                  "includeNullMetadata": true,
+                  "instant": false,
+                  "legendFormat": "{{nodename}}",
+                  "range": true,
+                  "refId": "A",
+                  "useBackend": false
+                }
+              ],
+              "title": "Memory (Last)",
+              "type": "bargauge"
+            }
+          ],
+          "title": "Memory - $cluster",
+          "type": "row"
+        }
+      ],
+      "refresh": "5s",
+      "schemaVersion": 39,
+      "tags": [
+        "Borda"
+      ],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "selected": false,
+              "text": "myk8s",
+              "value": "myk8s"
+            },
+            "datasource": {
+              "type": "prometheus",
+              "uid": "metrics-all"
+            },
+            "definition": "label_values(up{job=\"kube-state-metrics\"},cluster)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Cluster",
+            "multi": false,
+            "name": "cluster",
+            "options": [],
+            "query": {
+              "qryType": 1,
+              "query": "label_values(up{job=\"kube-state-metrics\"},cluster)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 2,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 1,
+            "type": "query"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-5m",
+        "to": "now"
+      },
+      "timeRangeUpdatedDuringEditOrView": false,
+      "timepicker": {},
+      "timezone": "Europe/Istanbul",
+      "title": "Node - Resources",
+      "uid": "dashboards-root-node-resources",
+      "version": 3,
+      "weekStart": ""
+    }

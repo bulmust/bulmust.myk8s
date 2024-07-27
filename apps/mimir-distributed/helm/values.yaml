@@ -1,0 +1,383 @@
+#! Global values
+global:
+  
+  # Dns service
+  #dnsService: coredns
+  dnsService: kube-dns
+  dnsNamespace: kube-system
+
+mimir:
+  # Structured Config
+  structuredConfig:
+
+    # Tenant Federation
+    tenant_federation:
+      enabled: true
+
+    # Limits
+    #* https://grafana.com/docs/mimir/latest/configure/configure-metrics-storage-retention/#configure-the-storage-retention
+    limits:
+
+      # Retention
+      compactor_blocks_retention_period: 2d
+      max_global_series_per_user: 700000
+      ingestion_rate: 50000
+      ingestion_burst_size: 70000
+
+  # Runtinme Config
+  #* https://grafana.com/docs/mimir/latest/configure/about-runtime-configuration/
+  # runtimeConfig:
+  #   # Tenant Based Retention
+  #   overrides:
+  #     myk8s-2:
+  #       retention_period: 4d
+
+
+#! Mimir Alertmanager
+alertmanager:
+  enabled: false
+
+#! Mimir Distributor
+distributor:
+  replicas:  1
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+
+  # resources:
+  #   requests:
+  #     cpu: 700m
+  #     memory: 350Mi
+  #   limits:
+  #     memory: 1000Mi
+
+#! Mimir Ingester
+ingester:
+
+  # Mimir Ingester Replica
+  #* 1 is not enough
+  replicas: 2
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+  
+  # Ingester Persisten Volume
+  persistentVolume:
+    enabled: false
+    #size: 2Gi
+  
+  # resources:
+  #   requests:
+  #     cpu: 800m
+  #     memory: 3Gi
+  #   limits:
+  #     memory: 6Gi
+  
+  # # Rollout Operator
+  # rollout_operator:
+  #   enabled: false
+
+  # Zone Aware Replication
+  zoneAwareReplication:
+    enabled: false
+
+#! Mimir Overrides Exporter
+overrides_exporter:
+  replicas: 1
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+  
+  # resources:
+  #   requests:
+  #     cpu: 50m
+  #     memory: 50Mi
+  #   limits:
+  #     memory: 200Mi
+
+#! Mimir Ruler
+ruler:
+  replicas: 1
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+  
+  # resources:
+  #   requests:
+  #     cpu: 50m
+  #     memory: 50Mi
+  #   limits:
+  #     memory: 200Mi
+
+#! Mimir Querier
+querier:
+  replicas: 1
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+  
+  # resources:
+  #   requests:
+  #     cpu: 100m
+  #     memory: 100Mi
+  #   limits:
+  #     memory: 400Mi
+
+#! Mimir Query Frontend
+query_frontend:
+  replicas: 1
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+  
+  # resources:
+  #   requests:
+  #     cpu: 50m
+  #     memory: 100Mi
+  #   limits:
+  #     memory: 300Mi
+
+#! Store Gateway
+store_gateway:
+  replicas: 1
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+  
+  persistentVolume:
+    enabled: false
+    #size: 2Gi
+  
+  # resources:
+  #   requests:
+  #     cpu: 100m
+  #     memory: 200Mi
+  #   limits:
+  #     memory: 500Mi
+  
+  #! Zone Aware Replication
+  zoneAwareReplication:
+    enabled: false
+
+#! Mimir Compactor
+compactor:
+  replicas: 1
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+  
+  persistentVolume:
+    enabled: false
+    #size: 5Gi
+  
+  # resources:
+  #   requests:
+  #     cpu: 100m
+  #     memory: 80Mi
+  #   limits:
+  #     memory: 1000Mi
+
+#! Mimir Minio
+minio:
+  enabled: true
+
+  rootUser: bulmust
+  rootPassword: bulmustbulmust
+
+  persistence:
+    size: 10Gi
+  # resources:
+  #   limits:
+  #     memory: 4000Mi
+  #   requests:
+  #     cpu: 200m
+  #     memory: 500Mi
+
+  #! Minio Console Ingress
+  consoleIngress:
+    enabled: true
+    ingressClassName: nginx
+    path: /
+    hosts:
+      - mimir-minio-console.localhost
+    tls:
+    - secretName: mimir-minio-console-tls
+      hosts:
+        - mimir-minio-console.localhost
+  
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+  
+  #! Service Monitor
+  metrics:
+    # Namespace is different from the prometheus-operator
+    #namespace: monitoring-p8s-stack
+    serviceMonitor:
+      additionalLabels:
+        release: p8s-stack
+      enabled: true
+
+#! Mimir Nginx
+nginx:
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+
+  # resources:
+  #   requests:
+  #     cpu: 100m
+  #     memory: 50Mi
+  #   limits:
+  #     memory: 200Mi
+  
+  #! Mimir ingress
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - host: mimir.localhost
+        paths:
+          - path: '/'
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: mimir-tls
+        hosts:
+          - mimir.localhost
+
+#! Meta Monitoring
+metaMonitoring:
+  # Dashboards
+  dashboards:
+    enabled: true
+
+    # Add labels and annotations to the dashboards
+    #* Check configs in Grafana Helm Chart: .Values.sidecar.dashboards.folderAnnotation
+    labels:
+      grafana_dashboard: "load"
+    annotations:
+      grafana_folder: "Infrastructure"
+  
+  # Service Monitor
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+  
+  # Grafana Agent
+  grafanaAgent:
+    enabled: true
+
+    # Image
+    image:
+      tag: v0.41.0
+    
+    # tolerations:
+    #   - key: "product"
+    #     operator: "Equal"
+    #     value: "monitoring"
+    #     effect: "NoSchedule"
+    # nodeSelector:
+    #   role: monitoring
+    
+    # Config
+    installOperator: true
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+    
+    # Logs
+    logs:
+      enabled: false
+    
+    # Metrics
+    metrics:
+      enabled: true
+      remote:
+        url: http://mimir-nginx:80/api/v1/push
+        #auth:
+        headers:
+          X-Scope-OrgID: mimir-metamonitoring
+      scrapeK8s:
+          enabled: false
+
+#! Grafana Agent Operator
+#* https://github.com/grafana/helm-charts/blob/main/charts/agent-operator/values.yaml
+grafana-agent-operator:
+  image:
+    tag: v0.40.4
+  
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+  
+  # resources:
+  #   requests:
+  #     cpu: 50m
+  #     memory: 150Mi
+  #   limits:
+  #     memory: 600Mi
+
+#! Mimir Query Scheduler
+query_scheduler:
+  replicas: 1
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+
+  # resources:
+  #   limits:
+  #     memory: 300Mi
+  #   requests:
+  #     cpu: 100m
+  #     memory: 128Mi
+
+#! Mimir Rollout Operator
+rollout_operator:
+  enabled: false

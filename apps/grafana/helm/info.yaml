@@ -1,0 +1,8 @@
+chartName: grafana
+repoURL: https://grafana.github.io/helm-charts
+version: 8.3.6
+deployment:
+  name: grafana
+  namespace: monitoring
+  project: default
+  server: https://kubernetes.default.svc

@@ -1,0 +1,8 @@
+chartName: minio
+repoURL: https://charts.min.io/
+version: 5.2.0
+deployment:
+  name: minio
+  namespace: monitoring
+  project: default
+  server: https://kubernetes.default.svc

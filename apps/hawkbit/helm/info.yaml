@@ -1,0 +1,8 @@
+chartName: hawkbit
+repoURL: https://eclipse.org/packages/charts
+version: 1.6.0
+deployment:
+  name: hawkbit
+  namespace: hawkbit
+  project: default
+  server: https://kubernetes.default.svc

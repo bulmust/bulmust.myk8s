@@ -1,0 +1,305 @@
+# #! Gloabl Configuration
+# global:
+#   # Image Pull Secrets
+#   imagePullSecrets:
+#     - name: nexus
+
+# #! Image
+# image:
+#   registry: docker.io
+#   repository: grafana/grafana
+#   tag: "11.0.0"
+#   pullPolicy: IfNotPresent
+
+# #! Curl Image
+# downloadDashboardsImage:
+#   repository: nexus-image.localhost/curlimages/curl
+
+# #! Init Chown Image
+# initChownData:
+#   image:
+#     registry: nexus-image.localhost
+
+# #! Test Framework Image
+# testFramework:
+#   registry: nexus-image.localhost
+
+# #! Image Renderer Image
+# imageRenderer:
+#   image:
+#     registry: nexus-image.localhost
+
+#! Ingress
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hosts:
+    - grafana.localhost
+  # path: /
+  #pathType: ImplementationSpecific
+  # tls:
+  #   - secretName: grafana-tls
+  #     hosts:
+  #       - grafana.localhost
+
+##! Resource Limits/Requests
+# resources:
+#   limits:
+#     memory: 1Gi
+#   requests:
+#     cpu: 140m
+#     memory: 250Mi
+
+##! Create PVC
+# persistence:
+#   type: pvc
+#   enabled: true
+#   annotations:
+#     volume.kubernetes.io/selected-node: myk8s-worker2 # Node name
+#   accessModes:
+#     - ReadWriteOnce
+#   size: 1Gi
+
+#! Username and Password
+adminUser: bulmust
+adminPassword: bulmustbulmust
+
+#! Add secret for Azure AD
+# extraSecretMounts:
+#   - name: grafana-secrets-extra
+#     secretName: grafana-secrets-extra
+#     defaultMode: 0440
+#     mountPath: /etc/secrets/azure-ad-secret
+#     readOnly: true
+
+#! Datasources
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    
+    ##! Datasources - Mimir
+    - name: Metrics_All
+      uid: metrics-all
+      type: prometheus
+      access: proxy
+      orgId: 1
+      url: http://mimir-nginx.monitoring.svc:80/prometheus
+      editable: true
+      isDefault: false
+      #! Datasources - Mimir - Headers
+      jsonData:
+        httpHeaderName1: "X-Scope-OrgID"
+      secureJsonData:
+        #* Do not put any spaces between | and the value
+        httpHeaderValue1: myk8s|mimir-metamonitoring
+    
+    #! Data sources - Local Prometheus
+    - name: Local
+      uid: metrics-local
+      type: prometheus
+      access: proxy
+      orgId: 1
+      url: http://p8s-stack-kube-prometheus-prometheus.monitoring.svc:9090
+      editable: true
+      isDefault: true
+
+    #! Data sources - Loki
+    - name: Logs_All
+      uid: logs-all
+      type: loki
+      access: proxy
+      orgId: 1
+      #url: http://loki-distributed-gateway.monitoring.svc.cluster.local/
+      url: http://loki-gateway.monitoring.svc.cluster.local/
+      editable: true
+      isDefault: false
+      jsonData:
+        httpHeaderName1: "X-Scope-OrgID"
+      secureJsonData:
+        httpHeaderValue1: myk8s
+    
+    #! Data sources - Infinity
+    #* https://grafana.com/docs/plugins/yesoreyeram-infinity-datasource/latest/setup/provisioning/
+    - name: Json
+      uid: json
+      type: yesoreyeram-infinity-datasource
+
+#! Dashboard Providers
+# dashboardProviders:
+#   dashboardproviders.yaml:
+#     apiVersion: 1
+#     providers:
+    
+#     #! Create Infrasructure Folder
+#     - name: 'infrastructure' # Name of this must start with lowercase
+#       orgId: 1
+#       folder: 'Infrastructure' # Name of the folder shown in Grafana
+#       folderUid: infrastructure-folder
+#       type: file
+#       disableDeletion: false
+#       editable: true
+#       options:
+#         path: /var/lib/grafana/dashboards/infrastructure
+
+#! Add dashboard to 'Infrastructure' folder
+# dashboards:
+#   infrastructure:
+#     k8s-addons-prometheus:
+#       gnetId: 19105
+#       datasource: 'Metrics_All'
+
+#! Grafana Configuration (grafana.ini)
+grafana.ini:
+  # Configure feature toggles
+  #* https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/feature-toggles/
+  # feature_toggles:
+  #   tempoApmTable: true
+  #   traceToMetrics: true
+
+  # # Data Proxy Configuration
+  # dataproxy:
+  #   timeout: 300
+
+  # # User Configuration
+  # users:
+  #   viewers_can_edit: "True"
+
+  # # Grafana.net Configuration
+  # grafana_net:
+  #   url: https://nexus.localhost/repository/grafana.net/
+
+  # Database Configuration
+  database:
+    wal: true
+  
+  # Azure-AD Configuration
+  server:
+    root_url: https://%(domain)s:/
+  # auth.azuread:
+  #   allow_assign_grafana_admin: true
+  #   allow_sign_up: true
+  #   auth_url: 
+  #   auto_login: false
+  #   client_id:
+  #   client_secret: $__file{/etc/secrets/azure-ad-secret/client_secret}
+  #   enabled: true
+  #   name: Azure AD
+  #   role_attribute_strict: true
+  #   scopes: openid email profile
+  #   skip_org_role_sync: false
+  #   token_url:
+
+  # Assign Dashboard to Home
+  #* You have to import configmap with the dashboard
+  #* The name of json file must be the same as the name of the dashboard in the configmap
+  dashboards:
+    default_home_dashboard_path: /tmp/dashboards/dashboards-root-node-resources.json
+
+#! Plugins
+plugins:
+  - grafana-polystat-panel
+  - yesoreyeram-infinity-datasource
+
+#! Sidecar
+#* If you want to add a dashboard, use configmap:
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: dashboard-name
+  
+#   #* Send this dashboard to 'Infra' folder
+#   annotations:
+#     grafana_folder: "Infrastructure"
+
+#   #* This label is required for the sidecar to pick up the dashboard
+#   labels:
+#     grafana_dashboard: "load"
+# data:
+#   dashboard1.json: |
+#     #* JSON HERE
+#     {
+#       "annotations": {}
+#     }
+sidecar:
+  # Dashboards
+  dashboards:
+    enabled: true
+
+    # Catch all dashboards with this label
+    label: grafana_dashboard
+    labelValue: "load"
+    
+    # Search all namespaces
+    searchNamespace: ALL
+
+    # Annotations for sending dashboards to specific folders
+    folderAnnotation: grafana_folder
+    
+    # Multi Cluster
+    multicluster:
+      global:
+        enabled: true
+      etcd:
+        enabled: true
+    
+    # Provider
+    provider:
+      allowUiUpdates: true
+      foldersFromFilesStructure: true
+  
+  # # Alerts
+  # alerts:
+  #   label: grafana_alert
+  #   enabled: true
+  #   searchNamespace: ALL
+  #   labelValue: "load"
+  #   provider:
+  #     allowUiUpdates: true
+
+#! Image Ren
+imageRenderer:
+  grafanaProtocol: https
+
+#! Alerts
+# alerting:
+
+  # # Contactpoints
+  # contactpoints.yaml:
+  #   secret:
+  #     apiVersion: 1
+  #     contactPoints:
+        
+  #       # Microsoft Teams
+  #       - orgId: 1
+  #         name: Teams-Channel-Name
+  #         receivers:
+  #         - uid: teams-chanel-name-uid1
+  #           type: teams
+  #           settings:
+  #             url:
+  #             sectiontitle: ''
+  #             summary: |
+  #               {{ `{{ include "default.message" . }}` }}
+
+  # # Policies
+  # policies.yaml:
+  #   policies:
+  #     - orgId: 1
+  #       receiver: Teams-Channel-Name
+  #
+  #       # Conditions
+  #       #* If you label your alerts with 'send' and 'severity', It will send alerts to the Teams-Chanel-Name
+  #       matchers:
+  #         - send = teams-devops-infra
+  #         - severity = critical
+
+#! Node Selector/Tolerations
+#* If the nodes are tainted
+# nodeSelector:
+#   role: monitoring
+# tolerations:
+#   - key: "product"
+#     operator: "Equal"
+#     value: "monitoring"
+#     effect: "NoSchedule"

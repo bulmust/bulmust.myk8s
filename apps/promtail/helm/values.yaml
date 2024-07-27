@@ -1,0 +1,36 @@
+##! Resources
+# resources:
+#   limits:
+#     memory: 600Mi
+#   requests:
+#     cpu: 120m
+#     memory: 250Mi
+
+##! Service Monitor
+# serviceMonitor:
+#   enabled: true
+
+#! Config
+config:
+  clients:
+    #- url: http://loki-distributed-gateway/loki/api/v1/push
+    - url: http://loki-gateway/loki/api/v1/push
+      tenant_id: myk8s
+      external_labels:
+        cluster: myk8s
+      tls_config:
+        insecure_skip_verify: true
+
+#! Tolerations
+# tolerations:
+#   - key: "product"
+#     operator: "Equal"
+#     value: "monitoring"
+#     effect: "NoSchedule"
+#   - key: "product"
+#     operator: "Equal"
+#     value: "apps"
+#     effect: "NoSchedule"
+#   - key: node-role.kubernetes.io/control-plane
+#     operator: Exists
+#     effect: NoSchedule

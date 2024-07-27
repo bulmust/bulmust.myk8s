@@ -1,0 +1,30 @@
+global:
+  #! Global domain for the ArgoCD server
+  domain: argocd.localhost
+
+server:
+  #! Ingress configuration
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    
+    # @default -- `""` (defaults to global.domain)
+    # hostname: ""
+    
+    # path: /
+    pathType: "ImplementationSpecific"
+    tls:
+      - secretName: argocd-tls
+        hosts:
+          - argocd.localhost
+configs:
+  #! If self-signed certificate is used, set this to true
+  params:
+    server.insecure: true
+  
+  secret:
+    #! Argo server admin password
+    # Argo expects the password in the secret to be bcrypt hashed. You can create this hash with
+    #* `htpasswd -nbBC 10 "" admin | tr -d ':\n' | sed 's/$2y/$2a/'`
+    # For htpasswd binary, you can install apache2-utils package
+    argocdServerAdminPassword: $2a$10$ilalPZ73ChMgFqMT.WNSkes9LiOeAhhai6AjdrK0cHFN0OnUOMHjK

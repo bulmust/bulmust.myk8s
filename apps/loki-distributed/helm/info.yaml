@@ -1,0 +1,8 @@
+chartName: mimir-distributed
+repoURL: https://grafana.github.io/helm-charts
+version: 5.3.0
+deployment:
+  name: mimir-distributed
+  namespace: monitoring
+  project: default
+  server: https://kubernetes.default.svc

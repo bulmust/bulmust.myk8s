@@ -1,0 +1,8 @@
+chartName: kube-prometheus-stack
+repoURL: https://prometheus-community.github.io/helm-charts
+version: 61.3.2
+deployment:
+  name: p8s-stack
+  namespace: monitoring
+  project: default
+  server: https://kubernetes.default.svc

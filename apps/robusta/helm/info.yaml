@@ -1,0 +1,8 @@
+chartName: robusta
+repoURL: https://robusta-charts.storage.googleapis.com
+version: 0.13.1
+deployment:
+  name: robusta
+  namespace: monitoring
+  project: default
+  server: https://kubernetes.default.svc

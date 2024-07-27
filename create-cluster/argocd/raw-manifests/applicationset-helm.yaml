@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: applicationset-helm
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: 'https://github.com/bulmust/bulmust.myk8s'
+        revision: 'HEAD'
+        files:
+          - path: apps/**/helm/info.yaml
+  template:
+    metadata:
+      name: '{{.deployment.name}}'
+    spec:
+      project: '{{.deployment.project}}'
+      source:
+        repoURL: '{{.repoURL}}'
+        chart: '{{.chartName}}'
+        targetRevision: '{{.version}}'
+        helm:
+          valueFiles:
+            - https://raw.githubusercontent.com/bulmust/bulmust.myk8s/main/apps/{{.deployment.name}}/helm/values.yaml
+      destination:
+        server: '{{.deployment.server}}'
+        namespace: '{{.deployment.namespace}}'
+      syncPolicy:
+        syncOptions:
+        - CreateNamespace=true
+        - ServerSideApply=true

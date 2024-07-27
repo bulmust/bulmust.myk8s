@@ -1,0 +1,6 @@
+chartName: argo-cd
+repoURL: https://argoproj.github.io/argo-helm
+version: 3.35.4
+deployment:
+  name: argocd
+  namespace: argocd

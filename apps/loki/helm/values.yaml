@@ -1,0 +1,647 @@
+#! Global Config
+#global:
+  # # Dns Service
+  # dnsService: coredns # Default: kube-dns
+
+#   # Image
+#   image:
+#     registry: nexus-image.localhost
+
+# # Image Pull Secrets
+# imagePullSecrets:
+#   - name: nexus
+
+#! Deployment Mode
+deploymentMode: Distributed # Default: SimpleScalable
+
+loki:
+  #! Authentication
+  auth_enabled: true # Default: true
+  
+  structuredConfig:
+    #! Analytics Config
+    #* https://grafana.com/docs/loki/latest/configure/#analytics
+    analytics:
+      reporting_enabled: false
+
+  #! Querier Config
+  #* https://grafana.com/docs/loki/latest/configure/#querier
+  querier:
+    # Multi Tenant Queries
+    multi_tenant_queries_enabled: true
+
+    # if you have enough memory and CPU you can increase, reduce if OOMing
+    max_concurrent: 8 # Default: 4
+  
+  #! Compactor Config
+  #* https://grafana.com/docs/loki/latest/configure/#compactor
+  compactor:
+    #* https://grafana.com/docs/loki/latest/operations/storage/retention/#retention-configuration
+    compaction_interval: 30m
+    retention_delete_delay: 1m
+    retention_delete_worker_count: 150
+    retention_enabled: true
+    delete_request_store: s3
+
+  #! Limits Config
+  #* https://grafana.com/docs/loki/latest/configure/#limits_config
+  limits_config:
+    # Retention
+    retention_period: 1d
+    
+    ingestion_rate_mb: 256 # Default: 4
+    ingestion_burst_size_mb: 512 # Default: 6
+    max_label_name_length: 4096 # Default: 1024
+    max_label_value_length: 4096 # Default: 2048
+    max_label_names_per_series: 100 # Default: 15
+    max_global_streams_per_user: 10000 # Default: 5000
+    max_query_series: 2000 # Default: 500
+    per_stream_rate_limit: 128MB # Default: 3MB
+    per_stream_rate_limit_burst: 512MB # Default: 15MB
+    cardinality_limit: 200000 # Default: 100000
+    max_entries_limit_per_query: 15000 # Default: 5000
+
+    # ingestion_rate_strategy: global # Default
+    # reject_old_samples: true # Default
+    # reject_old_samples_max_age: 1w # Default
+    # creation_grace_period: 10m # Default
+    # max_line_size: 256KB # Default
+    # max_query_lookback: 0s # Default: 0s
+    # max_cache_freshness_per_query: 10m # Default
+    # split_queries_by_interval: 15m # Default
+    # query_timeout: 300s # Default
+    # volume_enabled: true # Default
+
+    # #* Retention Stream Config
+    # retention_stream:
+    #   - selector: '{namespace="dev"}'
+    #     priority: 1
+    #     period: 24h
+    # per_tenant_override_config: /etc/overrides.yaml
+  
+  # #! Runtime Config
+  #* https://grafana.com/docs/loki/latest/configure/#runtime_config
+  # runtimeConfig:
+  #   #* https://grafana.com/docs/loki/latest/configure/#runtime-configuration-file
+  #   overrides:
+  #     "myk8s":
+  #       retention_period: 168h
+  #       ingestion_rate_mb: 10
+  #       retention_stream:
+  #         - selector: '{namespace="prod"}'
+  #           priority: 2
+  #           period: 336h
+  #         - selector: '{container="loki"}'
+  #           priority: 1
+  #           period: 72h
+  #     "myk8s2":
+  #       retention_period: 24h
+  #       max_streams_per_user: 1000000
+  #       max_chunks_per_query: 1000000
+  #       retention_stream:
+  #         - selector: '{container="nginx", level="debug"}'
+  #           priority: 1
+  #           period: 24h
+
+  #! Schema Config
+  #* https://grafana.com/docs/loki/latest/configure/#schema_config
+  schemaConfig:
+    configs:
+      - from: 2024-06-01
+        store: tsdb
+        object_store: s3
+        schema: v13
+        index:
+          prefix: loki_index_
+          period: 24h
+  
+  #! Ingester Config
+  #* https://grafana.com/docs/loki/latest/configure/#ingester
+  ingester:
+    #* https://grafana.com/blog/2021/02/16/the-essential-config-settings-you-should-use-so-you-wont-drop-logs-in-loki/
+    # gzip is the best compression ratio, but we suggest snappy for its faster decompression rate, which results in better query speeds.
+    chunk_encoding: snappy # Default: gzip
+  
+  # #! Tracer Config
+  # #* https://grafana.com/blog/2021/02/16/the-essential-config-settings-you-should-use-so-you-wont-drop-logs-in-loki/
+  # tracing:
+  #   enabled: true # Default
+
+#! Monitoring
+monitoring:
+  # Dashboards for monitoring Loki
+  dashboards:
+    enabled: true
+    #* Check configs in Grafana Helm Chart: .Values.sidecar.dashboards.folderAnnotation
+    annotations:
+      grafana_folder: "Infrastructure"
+    #* Check configs in Grafana Helm Chart: .Values.sidecar.dashboards.labelValue
+    labels:
+      grafana_dashboard: "load"
+  
+  # #! ServiceMonitor configuration
+  # serviceMonitor:
+  #   enabled: true
+  #   labels:
+  #     release: p8s-stack
+  
+  # #! Self Monitoring
+  # selfMonitoring:
+  #   enabled: false # Default: false
+
+#! Gateway Pod
+gateway:
+  enabled: true
+
+  # If you DONT want to spread the replicas across the nodes, you should define the affinity as below
+  affinity: {}
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    # annotations:
+    #   cert-manager.io/cluster-issuer: local-ca-cert-issuer
+    #   cert-manager.io/cluster-issuer: letsencrypt-prod
+    #   acme.cert-manager.io/http01-edit-in-place: "true"
+    #   nginx.org/proxy-buffer-size: 8k
+    #   nginx.org/proxy-send-timeout: "600s"
+    #   nginx.org/proxy-read-timeout: "600s"
+    #   nginx.org/proxy-connect-timeout: "600s"
+    #   nginx.org/client-header-timeout: "600s"
+    #   nginx.org/client-body-timeout: "600s"
+    #   nginx.org/proxy-request-buffering: "off"
+    hosts:
+      - host: loki.localhost
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: loki-tls
+        hosts:
+          - loki.localhost
+  # nginxConfig:
+  #   serverSnippet: client_max_body_size 200M;
+    #httpSnippet: client_max_body_size 200M;
+  
+  # #* Basic Auth
+  # basicAuth:
+  #   enabled: false
+  #   username: null
+  #   password: null
+
+  # # Resources
+  # resources:
+  #   limits:
+  #     memory: 100Mi
+  #   requests:
+  #     cpu: 50m
+  #     memory: 25Mi
+  
+  # # Tolerations
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  
+  # # Node Selector
+  # nodeSelector:
+  #   role: monitoring
+
+#! Loki Canary
+#* https://grafana.com/docs/loki/latest/operations/loki-canary/
+lokiCanary:
+  enabled: true # Default: true
+  push: false # Default: true
+
+  # # Resources
+  # resources:
+  #   limits:
+  #     memory: 100Mi
+  #   requests:
+  #     cpu: 50m
+  #     memory: 50Mi
+
+  # # Tolerations
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+
+  # # Node Selector
+  # nodeSelector:
+  #   role: monitoring
+
+#! Ingester Pod
+#* https://grafana.com/docs/loki/next/get-started/components/#ingester
+ingester:
+  extraArgs:
+    - -config.expand-env=true
+  replicas: 2 # If you put 1, promtail says "host=loki-gateway msg="error sending batch, will retry" status=500 tenant=myk8s error="server returned HTTP status 500 Internal Server Error (500): at least 2 live replicas required, could only find 1"
+  # If you want to 3 replicas, you have to define max unavailable as 1
+  # replicas: 3
+  # maxUnavailable: 1
+  
+  # If you DONT want to spread the replicas across the nodes, you should define the affinity as below
+  affinity: {}
+  
+  # Zone Aware Replication
+  zoneAwareReplication:
+    #! If it false, you have to manually remove 
+    #! -ingester.ring.instance-availability-zone=zone-default
+    #! in the ingester sts (ver 6.6.2)
+    enabled: false
+
+  # Topology Spread Constraints
+  topologySpreadConstraints: []
+
+  # Persistence
+  persistence:
+    enabled: false
+    # annotations:
+    #   volume.kubernetes.io/selected-node: myk8s-worker2 # Node name
+    #size: 3Gi
+    #storageClass: local-path
+  
+  # # Resources
+  # resources:
+  #   limits:
+  #     memory: 3000Mi
+  #   requests:
+  #     cpu: 100m
+  #     memory: 150Mi
+  
+  # # Torlerations
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # # Node Selector
+  # nodeSelector:
+  #   role: monitoring
+
+#! Querier Pod
+#* https://grafana.com/docs/loki/next/get-started/components/#querier
+querier:
+  extraArgs:
+    - -config.expand-env=true
+  replicas: 1
+  # If you want to 3 replicas, you have to define max unavailable as 1
+  # replicas: 3
+  # maxUnavailable: 1
+  
+  # If you DONT want to spread the replicas across the nodes, you should define the affinity as below
+  # affinity: {}
+
+  # # Persistence
+  # persistence:
+  #   enabled: true
+  #   annotations:
+  #     volume.kubernetes.io/selected-node: myk8s-worker2 # Node name
+  #   size: 2Gi
+  #   storageClass: local-path
+
+  # # Resources
+  # resources:
+  #   limits:
+  #     memory: 800Mi
+  #   requests:
+  #     cpu: 50m
+  #     memory: 220Mi
+  
+  # # Tolerations
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+
+  # # Node Selector
+  # nodeSelector:
+  #   role: monitoring
+
+#! Query Frontend Pod
+#* https://grafana.com/docs/loki/next/get-started/components/#query-frontend
+queryFrontend:
+  extraArgs:
+    - -config.expand-env=true
+  replicas: 1
+  # If you want to 3 replicas, you have to define max unavailable as 1
+  # replicas: 3
+  # maxUnavailable: 1
+  
+  # If you DONT want to spread the replicas across the nodes, you should define the affinity as below
+  # affinity: {}
+
+  # # Resources
+  # resources:
+  #   limits:
+  #     memory: 250Mi
+  #   requests:
+  #     cpu: 50m
+  #     memory: 80Mi
+  
+  # # Tolerations
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  
+  # # Node Selector
+  # nodeSelector:
+  #   role: monitoring
+
+#! Query Scheduler Pod
+#* https://grafana.com/docs/loki/next/get-started/components/#query-scheduler
+queryScheduler:
+  extraArgs:
+    - -config.expand-env=true
+  # It should be lower than `-querier.max-concurrent` to avoid generating back-pressure in queriers;
+  # it's also recommended that this value evenly divides the latter
+  replicas: 1
+  
+  # If you DONT want to spread the replicas across the nodes, you should define the affinity as below
+  # affinity: {}
+
+  # # Resources
+  # resources:
+  #   limits:
+  #     memory: 250Mi
+  #   requests:
+  #     cpu: 50m
+  #     memory: 80Mi
+
+  # # Tolerations
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  
+  # # Node Selector
+  # nodeSelector:
+  #   role: monitoring
+
+#! Distributor Pod
+#* https://grafana.com/docs/loki/next/get-started/components/#distributor
+distributor:
+  extraArgs:
+    - -config.expand-env=true
+  replicas: 1
+  # If you want to 3 replicas, you have to define max unavailable as 1
+  # replicas: 3
+  # maxUnavailable: 1
+  
+  # If you DONT want to spread the replicas across the nodes, you should define the affinity as below
+  # affinity: {}
+
+  # # Resources
+  # resources:
+  #   limits:
+  #     memory: 300Mi
+  #   requests:
+  #     cpu: 500m
+  #     memory: 80Mi
+  
+  # # Tolerations
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  
+  # # Node Selector
+  # nodeSelector:
+  #   role: monitoring
+  
+#! Compactor Pod
+#* https://grafana.com/docs/loki/next/get-started/components/#compactor
+compactor:
+  extraArgs:
+    - -config.expand-env=true
+  replicas: 1
+  # If you want to 3 replicas, you have to define max unavailable as 1
+  # replicas: 3
+  # maxUnavailable: 1
+  
+  # If you DONT want to spread the replicas across the nodes, you should define the affinity as below
+  # affinity: {}
+
+  # # Persistence
+  # persistence:
+  #   enabled: true
+  #   annotations:
+  #     volume.kubernetes.io/selected-node: myk8s-worker2 # Node name
+  #   size: 2Gi
+  #   storageClass: local-path
+  
+  # # Resources
+  # resources:
+  #   limits:
+  #     memory: 300Mi
+  #   requests:
+  #     cpu: 50m
+  #     memory: 100Mi
+  
+  # # Tolerations
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  
+  # # Node Selector
+  # nodeSelector:
+  #   role: monitoring
+
+#! Index Gateway Pod
+#* https://grafana.com/docs/loki/next/get-started/components/#index-gateway
+indexGateway:
+  extraArgs:
+    - -config.expand-env=true
+  replicas: 1
+  # If you want to 3 replicas, you have to define max unavailable as 1
+  # replicas: 3
+  # maxUnavailable: 1
+  
+  # If you DONT want to spread the replicas across the nodes, you should define the affinity as below
+  # affinity: {}
+
+  # # Persistence
+  # persistence:
+  #   enabled: true
+  #   annotations:
+  #     volume.kubernetes.io/selected-node: myk8s-worker2 # Node name
+  #   size: 2Gi
+  #   storageClass: local-path
+
+  # # Resources
+  # resources:
+  #   limits:
+  #     memory: 300Mi
+  #   requests:
+  #     cpu: 50m
+  #     memory: 100Mi
+
+  # # Tolerations
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+
+  # # Node Selector
+  # nodeSelector:
+  #   role: monitoring
+
+#! Chunks Cache Pod
+#* https://grafana.com/docs/loki/latest/operations/caching/
+chunksCache:
+  replicas: 0
+  # If you want to 3 replicas, you have to define max unavailable as 1
+  # replicas: 3
+  # maxUnavailable: 1
+  
+  # If you DONT want to spread the replicas across the nodes, you should define the affinity as below
+  # affinity: {}
+
+  # # Resources
+  # resources:
+  #   limits:
+  #     memory: 300Mi
+  #   requests:
+  #     cpu: 50m
+  #     memory: 100Mi
+
+  # # Tolerations
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+
+  # # Node Selector
+  # nodeSelector:
+  #   role: monitoring
+
+#! Results Cache Pod
+resultsCache:
+  replicas: 1
+  # # Node Selector / Tolerations
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+  # nodeSelector:
+  #   role: monitoring
+
+#! Minio
+#* https://github.com/minio/minio/tree/master/helm/minio
+minio:
+  enabled: true
+
+  # Fullname Override
+  fullnameOverride: "loki-minio"
+  
+  # Mode
+  mode: standalone # Default: distributed
+
+  # Image
+  image:
+    #repository: quay.io/minio/minio
+    tag: RELEASE.2024-04-18T19-09-19Z
+    #pullPolicy: IfNotPresent
+
+  # Console Username and Password
+  rootUser: bulmustAdmin
+  rootPassword: bulmustbulmust
+  
+  # Persistence
+  persistence:
+    enabled: true
+    # annotations:
+    #   volume.kubernetes.io/selected-node: myk8s-worker2 # Node name
+    #storageClass: local-path
+    size: 10Gi # Default: 500Gi
+  
+  # Console Ingress
+  consoleIngress:
+    enabled: true
+    ingressClassName: nginx
+    # annotations:
+    #   cert-manager.io/cluster-issuer: letsencrypt-prod
+    #   acme.cert-manager.io/http01-edit-in-place: "true"
+    #   nginx.ingress.kubernetes.io/proxy-buffer-size: 8k
+    #path: /
+    hosts:
+      - loki-minio-console.localhost
+    tls:
+      - secretName: loki-minio-console-tls
+        hosts:
+          - loki-minio-console.localhost
+  
+  # # Service Account
+  # serviceAccount:
+  #   name: minio-sa-loki
+  
+  # # Resources
+  # resources:
+  #   limits:
+  #     memory: 5800Mi
+  #   requests:
+  #     cpu: 200m
+  #     memory: 1400Mi
+  
+  ## Metrics
+  # metrics:
+  #   serviceMonitor:
+  #     additionalLabels:
+  #       release: p8s-stack
+  #     enabled: true
+
+  ## Toleations
+  # tolerations:
+  #   - key: "product"
+  #     operator: "Equal"
+  #     value: "monitoring"
+  #     effect: "NoSchedule"
+
+  # Node Selector
+  # nodeSelector:
+  #   role: monitoring
+
+  # # Post Job
+  #! Note: Does not exist in minio-4-0-15 yaml
+  # postJob:
+  #   # Tolerations
+  #   tolerations:
+  #     - key: "product"
+  #       operator: "Equal"
+  #       value: "monitoring"
+  #       effect: "NoSchedule"
+    
+  #   # Node Selector
+  #   nodeSelector:
+  #     role: monitoring
+
+#! Bloom Compactor
+bloomCompactor:
+  replicas: 0
+
+#! Bloom Gateway
+bloomGateway:
+  replicas: 0
+
+#! Single Mod Pods
+backend:
+  replicas: 0
+read:
+  replicas: 0
+write:
+  replicas: 0
+singleBinary:
+  replicas: 0

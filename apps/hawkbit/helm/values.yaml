@@ -1,0 +1,118 @@
+config:
+  application:
+    spring:
+      security:
+        user:
+          #! Username
+          name: admin
+  # ========================
+  secrets:
+    # SPRING_APPLICATION_JSON Part (Write Yaml, helm will convert to json)
+    hawkbit:
+      server:
+        im:
+          users:
+            - username: "johnlocke"
+              password: "{noop}c8lT@64ntdc3"
+              firstname: "Taygun"
+              lastname: "Super Admin"
+              permissions: "ALL"
+            - username: "hugoreyes"
+              password: "{noop}J8Q8OwJoeXvErTQN8HLkiR0r"
+              firstname: "Taygun"
+              lastname: "Observer"
+              permissions: "READ_TARGET, READ_REPOSITORY, READ_ROLLOUT"
+    spring:
+      security:
+        user:
+          #! Password
+          # the "{noop}" prefix is needed!
+          password: "{noop}admin"
+      datasource:
+        username: bulmust
+        password: bulmustbulmust
+  # ========================
+
+#! Hawkbit Persistence
+fileStorage:
+  enabled: true
+  pvcSize: "1Gi"
+
+#! MySQL
+# https://github.com/bitnami/charts/blob/master/bitnami/mysql/values.yaml
+mysql:
+  enabled: true
+  primary:
+    persistence:
+      enabled: true
+      size: "1Gi"
+  auth:
+    rootPassword: mysqlRootPassword
+    username: bulmust
+    password: bulmustbulmust
+  metrics:
+    enabled: false
+  #! MySQL Node Selector
+  # nodeSelector: {}
+  #! MySQL Tolerations
+  # tolerations: []
+
+#! RabbitMQ
+# https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
+rabbitmq:
+  enabled: true
+  
+  #! Bug fix
+  # https://github.com/bitnami/containers/issues/20752
+  #* /opt/bitnami/scripts/rabbitmq/run.sh: line 47: ulimit: open files: cannot modify limit: Operation not permitted
+  # ulimitNofiles: 0
+
+  persistence:
+    enabled: true
+    size: "1Gi"
+  auth:
+    erlangCookie: ssssssssssssssszzzzzzzzzzzzzzzzz3
+    username: hawkbitRabbit
+    password: hawkbitRabbitPass
+  metrics:
+    enabled: false
+  #! RabbitMQ Node Selector
+  # nodeSelector: {}
+  #! RabbitMQ Tolerations
+  # tolerations: []
+
+#! Env variables
+env:
+  springRabbitmqUsername: hawkbitRabbit
+  springRabbitmqPassword: hawkbitRabbitPass
+# env:
+#   springDatasourceHost: "hawkbit-mysql"
+#   springDatasourceDb: "hawkbit"
+#   # if springDatasourceUrl is set override default mysql db url
+#   springDatasourceUrl: ""
+#   springRabbitmqHost: "hawkbit-rabbitmq"
+
+#! Resources
+# resources:
+#   requests:
+#     cpu: 100m
+#     memory: 256Mi
+#   limits:
+#     cpu: 500m
+#     memory: 512Mi
+
+#! Node Selector
+# nodeSelector: {}
+#! Tolerations
+# tolerations: []
+
+image:
+  #! Newer images do not work
+  tag: 0.3.0M9-mysql
+
+#! Ingress MUST BE DISABLED
+# Install it manually
+# https://github.com/eclipse/packages/pull/314
+# kaf ingress.yaml => https://hawkbit.localhost/
+ingress:
+  enabled: false

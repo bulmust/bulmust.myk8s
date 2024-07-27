@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hawkbit
+  labels:
+    app.kubernetes.io/name: hawkbit
+    helm.sh/chart: hawkbit-1.6.0
+    app.kubernetes.io/instance: hawkbit
+    app.kubernetes.io/version: "0.3.0M6-mysql"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  rules:
+    - host: "hawkbit.localhost"
+      http:
+        paths:
+        - backend:
+            service:
+              name: hawkbit
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+  tls:
+  - hosts:
+    - hawkbit.localhost
+    secretName: hawkbit-localhost-tls

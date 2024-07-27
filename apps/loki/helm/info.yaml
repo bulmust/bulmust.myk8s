@@ -1,0 +1,8 @@
+chartName: loki
+repoURL: https://grafana.github.io/helm-charts
+version: 6.7.2
+deployment:
+  name: loki
+  namespace: monitoring
+  project: default
+  server: https://kubernetes.default.svc

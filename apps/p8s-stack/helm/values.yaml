@@ -1,0 +1,249 @@
+#! Global
+# global:
+#   imagePullSecrets:
+#     - name: nexus
+#   imageRegistry: nexus-image.localhost
+#   rbac:
+#     pspAnnotations:
+#       volume.kubernetes.io/selected-node: myk8s-worker2 # Node name
+
+#! Alertmanager default rules enabled even if alertmanager.enabled is false
+defaultRules:
+  create: true
+
+  # Turn off kubeProxy alert
+  rules:
+    kubeProxy: false
+
+#! Alertmanager
+alertmanager:
+  enabled: false
+
+#! Grafana
+grafana:
+  enabled: false
+
+  # Turn on grafana dashboards
+  forceDeployDashboards: true
+
+  # Timezone
+  defaultDashboardsTimezone: Europe/Istanbul
+
+  # Sidecar for default Dashboards
+  sidecar:
+    dashboards:
+      label: grafana_dashboard
+      labelValue: "load"
+
+      # Send default dashboards to Infrastucture folder
+      #* Check configs in Grafana Helm Chart: .Values.sidecar.dashboards.folderAnnotation
+      annotations:
+        grafana_folder: "Infrastructure"
+
+#! Prometheus
+prometheus:
+  # Image
+  # image:
+  #   registry: quay.io
+  #   repository: prometheus/prometheus
+  #   tag: v2.52.0
+
+  # Ingress
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    # annotations:
+    #   cert-manager.io/cluster-issuer: letsencrypt-prod
+    #   acme.cert-manager.io/http01-edit-in-place: "true"
+    hosts:
+      - prometheus.localhost
+    paths:
+      - "/"
+    tls:
+      - secretName: prometheus-tls
+        hosts:
+          - prometheus.localhost
+
+  #! Configurations (Flags etc.)
+  prometheusSpec:
+    # Features
+    enableFeatures:
+      # Exemplar Storage
+      #* https://prometheus.io/docs/prometheus/latest/feature_flags/#exemplars-storage
+      - exemplar-storage
+      
+      # Remote Write Receiver
+      #* https://prometheus.io/docs/prometheus/latest/feature_flags/#remote-write-receiver
+      - remote-write-receiver
+
+    # # Remote Write Receiver
+    # #* This is a potential security risk and should be disabled in production.
+    # enableRemoteWriteReceiver: true
+
+    # ServiceMonitor Selector
+    #* https://github.com/helm/charts/issues/13196
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+
+    # Enable Admin API
+    #* Enables access to the Prometheus web admin API.
+    #! This is a potential security risk and should be disabled in production.
+    enableAdminAPI: true
+
+    # Remote Write Dashboards
+    remoteWriteDashboards: true
+
+    # Retention
+    retention: 2d
+
+    # Scrape Options
+    scrapeInterval: 15s
+    scrapeTimeout: 15s
+
+    # Old Metrics Query
+    #* The maximum time a query may take before being aborted.
+    #* This is added because fake metrics are shown in Grafana
+    query:
+      lookbackDelta: 305s
+
+    # Add extra labels
+    externalLabels:
+      cluster: myk8s
+
+    # Persistence
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: local-path
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 8Gi
+
+    # Remote Write
+    #* https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write
+    remoteWrite:
+      - name: myk8s
+        url: http://mimir-nginx.monitoring.svc:80/api/v1/push
+        # tlsConfig:
+        #   insecureSkipVerify: true
+        headers:
+          X-Scope-OrgID: myk8s
+
+        # # Pick up only specific metrics
+        # #* https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.RelabelConfig
+        # writeRelabelConfigs:
+        #   - sourceLabels: [__name__]
+
+        #     #* Only include metrics with named "A" AND "B". Do not forget ""
+        #     regex: "up|node_boot_time_seconds|node_uname_info|node_cpu_seconds_total|node_memory_MemTotal_bytes|node_memory_MemFree_bytes|node_memory_Cached_bytes|node_memory_Buffers_bytes|node_memory_MemTotal_bytes"
+
+        #* Keep only the metrics that match the regex
+        #     action: keep
+
+        # collectd, pod_status
+    
+    # Additional Scrape Configs
+    # additionalScrapeConfigs:
+    #   - job_name: 'istanbul-nar1-windows-exporter'
+    #     static_configs:
+    #       - targets: ["192.168.1.1:9182"]
+
+    # # Resources
+    # resources:
+    #   requests:
+    #     cpu: 2000m
+    #     memory: 4500Mi
+    #   limits:
+    #     memory: 8Gi
+
+    # # Node Selector/Tolerations
+    # tolerations:
+    #   - key: "product"
+    #     operator: "Equal"
+    #     value: "monitoring"
+    #     effect: "NoSchedule"
+    # nodeSelector:
+    #   role: monitoring
+
+# #! Kube-state-metrics
+# kube-state-metrics:
+#   # Resources
+#   resources:
+#     requests:
+#       cpu: 60m
+#       memory: 60Mi
+#     limits:
+#       memory: 120Mi
+
+#   # Node Selector/Tolerations
+#   nodeSelector:
+#     role: monitoring
+#   tolerations:
+#     - key: "product"
+#       operator: "Equal"
+#       value: "monitoring"
+#       effect: "NoSchedule"
+
+# #! Node-exporter
+# prometheus-node-exporter:
+#   # Resources
+#   resources:
+#     requests:
+#       cpu: 40m
+#       memory: 50Mi
+#     limits:
+#       memory: 100Mi
+
+#   # Node Selector/Tolerations
+#   tolerations:
+#     - key: "product"
+#       operator: "Equal"
+#       value: "monitoring"
+#       effect: "NoSchedule"
+#     - key: "product"
+#       operator: "Equal"
+#       value: "apps"
+#       effect: "NoSchedule"
+#     - key: node-role.kubernetes.io/control-plane
+#       operator: Exists
+#       effect: NoSchedule
+
+#! Prometheus Operator
+# prometheusOperator:
+#   # Enable prometheus operator
+#   admissionWebhooks:
+#     patch:
+#       # Resources
+#       resources:
+#         limits:
+#           memory: 200Mi
+#         requests:
+#           cpu: 100m
+#           memory: 100M
+      
+#       # Node Selector/Tolerations
+#       nodeSelector:
+#         role: monitoring
+#       tolerations:
+#         - key: "product"
+#           operator: "Equal"
+#           value: "monitoring"
+#           effect: "NoSchedule"
+
+#   # Resources
+#   resources:
+#     requests:
+#       cpu: 120m
+#       memory: 100Mi
+#     limits:
+#       memory: 200Mi
+
+#   # Node Selector/Tolerations
+#   nodeSelector:
+#     role: monitoring
+#   tolerations:
+#     - key: "product"
+#       operator: "Equal"
+#       value: "monitoring"
+#       effect: "NoSchedule"
