@@ -78,21 +78,21 @@ datasources:
     apiVersion: 1
     datasources:
     
-    ##! Datasources - Mimir
-    - name: Metrics_All
-      uid: metrics-all
-      type: prometheus
-      access: proxy
-      orgId: 1
-      url: http://mimir-nginx.monitoring.svc:80/prometheus
-      editable: true
-      isDefault: false
-      #! Datasources - Mimir - Headers
-      jsonData:
-        httpHeaderName1: "X-Scope-OrgID"
-      secureJsonData:
-        #* Do not put any spaces between | and the value
-        httpHeaderValue1: myk8s|mimir-metamonitoring
+    # ##! Datasources - Mimir
+    # - name: Metrics_All
+    #   uid: metrics-all
+    #   type: prometheus
+    #   access: proxy
+    #   orgId: 1
+    #   url: http://mimir-nginx.monitoring.svc:80/prometheus
+    #   editable: true
+    #   isDefault: false
+    #   #! Datasources - Mimir - Headers
+    #   jsonData:
+    #     httpHeaderName1: "X-Scope-OrgID"
+    #   secureJsonData:
+    #     #* Do not put any spaces between | and the value
+    #     httpHeaderValue1: myk8s|mimir-metamonitoring
     
     #! Data sources - Local Prometheus
     - name: Local
