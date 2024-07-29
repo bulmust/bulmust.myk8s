@@ -3,6 +3,6 @@ repoURL: https://helm.kubeshark.co
 version: 52.3.69
 deployment:
   name: kubeshark
-  namespace: kubeshark
+  namespace: monitoring
   project: default
   server: https://kubernetes.default.svc
