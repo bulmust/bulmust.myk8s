@@ -1,0 +1,8 @@
+chartName: kubeshark
+repoURL: https://helm.kubeshark.co 
+version: 52.3.69
+deployment:
+  name: kubeshark
+  namespace: kubeshark
+  project: default
+  server: https://kubernetes.default.svc

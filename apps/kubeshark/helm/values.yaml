@@ -1,0 +1,8 @@
+tap:
+  enables: true
+  className: "nginx"
+  host: "kubeshark.localhost"
+  tls:
+    - secretName: "kubeshark.localhost"
+      hosts:
+        - "kubeshark.localhost"
