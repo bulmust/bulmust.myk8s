@@ -1,6 +1,8 @@
 chartName: argo-cd
 repoURL: https://argoproj.github.io/argo-helm
-version: 3.35.4
+version: 7.3.11
 deployment:
   name: argocd
   namespace: argocd
+  project: default
+  server: https://kubernetes.default.svc

@@ -35,12 +35,12 @@ ingress:
   ingressClassName: nginx
   hosts:
     - grafana.localhost
-  # path: /
-  #pathType: ImplementationSpecific
-  # tls:
-  #   - secretName: grafana-tls
-  #     hosts:
-  #       - grafana.localhost
+  path: /
+  pathType: ImplementationSpecific
+  tls:
+    - secretName: grafana-tls
+      hosts:
+        - grafana.localhost
 
 ##! Resource Limits/Requests
 # resources:

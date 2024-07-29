@@ -201,16 +201,12 @@ if [ "$PORT" = "443" ]; then
     
     # Test Ingress (Skip Certificate Verification)
     echo ">>>${GREEN}Test Ingress${NC}: ${RED}curl -k https://echo.localhost${NC}"
-    curl -k https://echo.localhost
-
 else
     echo ">>>${GREEN}Initialize Echo Ingress without Self-Signed Certificate${NC}"
     kubectl apply -f manifests/echoserver-ingress.yaml
     
     # Test Ingress
     echo ">>>${GREEN}Test Ingress${NC}: ${RED}curl echo.localhost${NC}"
-    sleep 10
-    curl echo.localhost
 fi
 
 # Echo Which Ingress to Use
@@ -255,22 +251,17 @@ if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
     helm repo update argo
 
     # Helm Install
-    ARGOCD_CHART_VERSION=$(cat ../apps/argocd/argocd/Chart.yaml|yq -r '.dependencies[0].version')
+    ARGOCD_CHART_VERSION=$(cat ./argocd/helm/info.yaml|yq -r '.version')
     echo ">>>${GREEN}Helm Install ArgoCD, Chart Version: ${ARGOCD_CHART_VERSION}${NC}"
-    helm upgrade --install --debug\
-        argocd argo/argo-cd \
-        --namespace argocd --create-namespace\
-        --version ${ARGOCD_CHART_VERSION}\
-        -f ../apps/argocd/argocd/values.yaml
+    helm upgrade --install --debug argocd argo/argo-cd --namespace=argocd --create-namespace --version=${ARGOCD_CHART_VERSION} -f ./argocd/helm/values.yaml
 
     # Wait for ArgoCD to be Ready
     echo ">>>${GREEN}Wait for ArgoCD to be Ready${NC}"
-    kubectl wait --namespace argocd --for=condition=ready pod --selector=app.kubernetes.io/instance=argocd --timeout=180s
+    kubectl wait --namespace argocd --for=condition=ready pod --selector=app.kubernetes.io/name=argocd-applicationset-controller --timeout=180s
 
     # Apply Application Sets
     echo ">>>${GREEN}Apply Application Sets${NC}"
-    kubectl apply -n argocd -f ../apps/argocd/argocd/do-not-deploy/applicationset-ns-apps.yaml
-    kubectl apply -n argocd -f ../apps/argocd/argocd/do-not-deploy/applicationset-ns-namespace-yamls.yaml
+    kubectl apply -n argocd -f argocd/raw-manifests/applicationset-helm.yaml
 
 else
     echo ">>>${GREEN}ArgoCD is not deployed${NC}"

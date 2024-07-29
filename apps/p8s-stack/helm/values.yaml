@@ -122,18 +122,18 @@ prometheus:
 
     # Remote Write
     #* https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write
-    remoteWrite:
-      - name: myk8s
-        url: http://mimir-nginx.monitoring.svc:80/api/v1/push
-        # tlsConfig:
-        #   insecureSkipVerify: true
-        headers:
-          X-Scope-OrgID: myk8s
+    # remoteWrite:
+      # - name: myk8s
+      #   url: http://mimir-nginx.monitoring.svc:80/api/v1/push
+      #   # tlsConfig:
+      #   #   insecureSkipVerify: true
+      #   headers:
+      #     X-Scope-OrgID: myk8s
 
-        # # Pick up only specific metrics
-        # #* https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.RelabelConfig
-        # writeRelabelConfigs:
-        #   - sourceLabels: [__name__]
+      #   # Pick up only specific metrics
+      #   #* https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.RelabelConfig
+      #   writeRelabelConfigs:
+      #     - sourceLabels: [__name__]
 
         #     #* Only include metrics with named "A" AND "B". Do not forget ""
         #     regex: "up|node_boot_time_seconds|node_uname_info|node_cpu_seconds_total|node_memory_MemTotal_bytes|node_memory_MemFree_bytes|node_memory_Cached_bytes|node_memory_Buffers_bytes|node_memory_MemTotal_bytes"
