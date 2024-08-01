@@ -87,6 +87,19 @@ fi
 echo ">>>${GREEN}Create Kind cluster with ${nodes_cp} control plane and ${nodes_worker} worker nodes and ingress-ready label${NC}"
 kind create cluster --name "$clusterName" --config manifests/kind-${nodes_cp}CP${nodes_worker}W.yaml
 
+# # Resolve the kind's known too many open files issue
+# #* https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files
+# # Get docker container names started by $clusterName
+# echo ">>>${GREEN}Get Docker Container Names${NC}"
+# containerNames=$(docker ps --format '{{.Names}}' | grep $clusterName)
+# # Execute the command in the each containers
+# for containerName in $containerNames; do
+#     echo ">>>${GREEN}Container Name${NC}: ${containerName}"
+#     docker exec -it $containerName bash -c "echo 'fs.inotify.max_user_watches=1048576' >> /etc/sysctl.conf"
+#     docker exec -it $containerName bash -c "echo 'fs.inotify.max_user_instances=512' >> /etc/sysctl.conf"
+#     docker exec -it $containerName bash -c "sysctl -p /etc/sysctl.conf"
+# done
+
 # Echo Current Context
 echo ">>>${GREEN}Current Context${NC}"
 # If current context is not kind-myk8s, switch to kind-myk8s
