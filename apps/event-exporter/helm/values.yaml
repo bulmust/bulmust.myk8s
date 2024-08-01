@@ -1,16 +1,31 @@
 config:
-  #logLevel: debug
-  metricsNamePrefix: 'event_exporter_'
-  receivers:
-    - name: "loki"
-      loki:
-        tenant_id: myk8s
-        external_labels:
-          cluster: myk8s
-        headers:
-          X-Scope-OrgID: myk8s
-        url: http://loki-gateway/loki/api/v1/push #http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push
-  route:
-    routes:
-      - match:
-          - receiver: "loki"
+  # Log level for the event exporter
+  logLevel: info #fatal, error, warn, info, debug
+  
+  #! Loki configuration (NOT WORKING)
+  #* https://github.com/resmoio/kubernetes-event-exporter?tab=readme-ov-file#loki
+#   receivers:
+#     - name: "loki"
+#       loki:
+#         tenant_id: myk8s
+#         external_labels:
+#           cluster: myk8s
+#         headers:
+#           X-Scope-OrgID: myk8s
+#         url: http://loki-gateway/loki/api/v1/push #http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push
+#   route:
+#     routes:
+#       - match:
+#           - receiver: "loki"
+
+#! ServiceMonitor configuration
+# metrics:
+#   enabled: true
+#   serviceMonitor:
+#     enabled: true
+#     interval: 15s
+#     metricRelabelings: 
+#       - sourceLabels: [__name__]
+#         regex: (.*)
+#         targetLabel: __name__
+#         replacement: event_exporter_${1}
