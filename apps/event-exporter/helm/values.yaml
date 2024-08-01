@@ -1,0 +1,16 @@
+config:
+  #logLevel: debug
+  metricsNamePrefix: 'event_exporter_'
+  receivers:
+    - name: "loki"
+      loki:
+        tenant_id: myk8s
+        external_labels:
+          cluster: myk8s
+        headers:
+          X-Scope-OrgID: myk8s
+        url: http://loki-gateway/loki/api/v1/push #http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push
+  route:
+    routes:
+      - match:
+          - receiver: "loki"

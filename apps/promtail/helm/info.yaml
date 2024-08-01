@@ -1,8 +1,8 @@
-chartName: grafana
+chartName: promtail
 repoURL: https://grafana.github.io/helm-charts
-version: 8.3.6
+version: 6.16.4
 deployment:
-  name: grafana
+  name: promtail
   namespace: monitoring
   project: default
   server: https://kubernetes.default.svc

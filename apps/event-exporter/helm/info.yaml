@@ -1,0 +1,8 @@
+chartName: kubernetes-event-exporter
+repoURL: https://charts.bitnami.com/bitnami
+version: 3.2.9
+deployment:
+  name: event-exporter
+  namespace: monitoring
+  project: default
+  server: https://kubernetes.default.svc
