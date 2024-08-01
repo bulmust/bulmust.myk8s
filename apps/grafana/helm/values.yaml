@@ -125,6 +125,16 @@ datasources:
       uid: json
       type: yesoreyeram-infinity-datasource
 
+    #! Delete data sources
+    #* https://grafana.com/docs/grafana/latest/administration/provisioning/#example-data-source-config-file
+    deleteDatasources:
+      - name: Local
+        org: 1
+      - name: Logs_All
+        org: 1
+      - name: Json
+        org: 1
+
 #! Dashboard Providers
 # dashboardProviders:
 #   dashboardproviders.yaml:
