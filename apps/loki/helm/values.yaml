@@ -134,7 +134,7 @@ monitoring:
     enabled: true
     #* Check configs in Grafana Helm Chart: .Values.sidecar.dashboards.folderAnnotation
     annotations:
-      grafana_folder: "Infrastructure"
+      grafana_folder: "infrastructure"
     #* Check configs in Grafana Helm Chart: .Values.sidecar.dashboards.labelValue
     labels:
       grafana_dashboard: "load"

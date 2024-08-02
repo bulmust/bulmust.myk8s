@@ -105,7 +105,7 @@ datasources:
       isDefault: true
 
     #! Data sources - Loki
-    - name: Logs_All
+    - name: Loki
       uid: loki
       type: loki
       access: proxy
@@ -144,7 +144,7 @@ dashboardProviders:
     #! Create Infrasructure Folder
     - name: 'infrastructure' # Name of this must start with lowercase
       orgId: 1
-      folder: 'Infrastructure' # Name of the folder shown in Grafana
+      folder: infrastructure # Name of the folder shown in Grafana
       folderUid: infrastructure-folder
       type: file
       disableDeletion: false
@@ -153,16 +153,11 @@ dashboardProviders:
         path: /var/lib/grafana/dashboards/infrastructure
 
 #! Add dashboard to 'Infrastructure' folder
-dashboards:
-  infra:
-    event-exporter:
-      gnetId: 17882
-      datasource: loki
 # dashboards:
 #   infrastructure:
 #     k8s-addons-prometheus:
 #       gnetId: 19105
-#       datasource: 'Metrics_All'
+#       datasource: 'prometheus'
 
 #! Grafana Configuration (grafana.ini)
 grafana.ini:
@@ -208,8 +203,8 @@ grafana.ini:
   # Assign Dashboard to Home
   #* You have to import configmap with the dashboard
   #* The name of json file must be the same as the name of the dashboard in the configmap
-  dashboards:
-    default_home_dashboard_path: /tmp/dashboards/dashboards-root-node-resources.json
+  # dashboards:
+  #   default_home_dashboard_path: /tmp/dashboards/dashboards-root-node-resources.json
 
 #! Plugins
 plugins:
