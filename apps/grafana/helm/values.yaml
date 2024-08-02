@@ -95,8 +95,8 @@ datasources:
     #     httpHeaderValue1: myk8s|mimir-metamonitoring
     
     #! Data sources - Local Prometheus
-    - name: Local
-      uid: metrics-local
+    - name: Prometheus
+      uid: prometheus
       type: prometheus
       access: proxy
       orgId: 1
@@ -106,7 +106,7 @@ datasources:
 
     #! Data sources - Loki
     - name: Logs_All
-      uid: logs-all
+      uid: loki
       type: loki
       access: proxy
       orgId: 1
@@ -125,34 +125,39 @@ datasources:
       uid: json
       type: yesoreyeram-infinity-datasource
 
-    #! Delete data sources
-    #* https://grafana.com/docs/grafana/latest/administration/provisioning/#example-data-source-config-file
-    deleteDatasources:
-      - name: Local
-        org: 1
-      - name: Logs_All
-        org: 1
-      - name: Json
-        org: 1
+    # #! Delete data sources
+    # #* https://grafana.com/docs/grafana/latest/administration/provisioning/#example-data-source-config-file
+    # deleteDatasources:
+    #   - name: Local
+    #     org: 1
+    #   - name: Logs_All
+    #     org: 1
+    #   - name: Json
+    #     org: 1
 
 #! Dashboard Providers
-# dashboardProviders:
-#   dashboardproviders.yaml:
-#     apiVersion: 1
-#     providers:
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
     
-#     #! Create Infrasructure Folder
-#     - name: 'infrastructure' # Name of this must start with lowercase
-#       orgId: 1
-#       folder: 'Infrastructure' # Name of the folder shown in Grafana
-#       folderUid: infrastructure-folder
-#       type: file
-#       disableDeletion: false
-#       editable: true
-#       options:
-#         path: /var/lib/grafana/dashboards/infrastructure
+    #! Create Infrasructure Folder
+    - name: 'infrastructure' # Name of this must start with lowercase
+      orgId: 1
+      folder: 'Infrastructure' # Name of the folder shown in Grafana
+      folderUid: infrastructure-folder
+      type: file
+      disableDeletion: false
+      editable: true
+      options:
+        path: /var/lib/grafana/dashboards/infrastructure
 
 #! Add dashboard to 'Infrastructure' folder
+dashboards:
+  infra:
+    event-exporter:
+      gnetId: 17882
+      datasource: loki
 # dashboards:
 #   infrastructure:
 #     k8s-addons-prometheus:

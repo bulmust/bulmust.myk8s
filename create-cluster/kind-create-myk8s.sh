@@ -89,6 +89,7 @@ kind create cluster --name "$clusterName" --config manifests/kind-${nodes_cp}CP$
 
 # # Resolve the kind's known too many open files issue
 # #* https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files
+# #* https://github.com/kubernetes-sigs/kind/issues/2586#issuecomment-1013614308
 # # Get docker container names started by $clusterName
 # echo ">>>${GREEN}Get Docker Container Names${NC}"
 # containerNames=$(docker ps --format '{{.Names}}' | grep $clusterName)
