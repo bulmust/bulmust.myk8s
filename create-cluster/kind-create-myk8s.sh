@@ -280,7 +280,6 @@ if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
     # Apply Application Sets
     echo ">>>${GREEN}Apply Application Sets${NC}"
     kubectl apply -n argocd -f argocd/raw-manifests/applicationset-helm.yaml
-
 else
     echo ">>>${GREEN}ArgoCD is not deployed${NC}"
 fi

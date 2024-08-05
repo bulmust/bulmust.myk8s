@@ -20,6 +20,10 @@ config:
         cluster: myk8s
       tls_config:
         insecure_skip_verify: true
+      #! Basic Auth
+      basic_auth:
+        username: bulmust
+        password: bulmustbulmust
 
 #! Tolerations
 # tolerations:

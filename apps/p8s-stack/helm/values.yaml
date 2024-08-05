@@ -48,9 +48,20 @@ prometheus:
   #   repository: prometheus/prometheus
   #   tag: v2.52.0
 
-  # Ingress
+  #! Ingress
   ingress:
     enabled: true
+    annotations:
+      # Certification
+      # cert-manager.io/cluster-issuer: letsencrypt-prod
+      #! Basic Auth Ingress
+      kubernetes.io/ingress.class: nginx
+      # type of authentication
+      nginx.ingress.kubernetes.io/auth-type: basic
+      # name of the secret that contains the user/password definitions
+      nginx.ingress.kubernetes.io/auth-secret: basic-auth
+      # message to display with an appropriate context why the authentication is required
+      nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
     ingressClassName: nginx
     # annotations:
     #   cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -63,9 +74,19 @@ prometheus:
       - secretName: prometheus-tls
         hosts:
           - prometheus.localhost
+  
+  #! Basic Auth Secret
+  extraSecret:
+    name: "basic-auth" # if not set, name will be auto generated
+    # Create a secret with the following command
+    # `htpasswd -c auth bulmust` , password: bulmustbulmust (# `kubectl create secret generic basic-auth --from-file=auth` also works)
+    data:
+      auth: |
+        bulmust:$apr1$JC8u9gle$D3alCoVzYKqI/VryZi25l/
 
   #! Configurations (Flags etc.)
   prometheusSpec:
+    
     # Features
     enableFeatures:
       # Exemplar Storage
@@ -120,15 +141,24 @@ prometheus:
             requests:
               storage: 8Gi
 
-    # Remote Write
-    #* https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write
+    # # Remote Write
+    # #* https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write
     # remoteWrite:
-      # - name: myk8s
-      #   url: http://mimir-nginx.monitoring.svc:80/api/v1/push
-      #   # tlsConfig:
-      #   #   insecureSkipVerify: true
-      #   headers:
-      #     X-Scope-OrgID: myk8s
+    #   - name: myk8s
+    #     url: http://mimir-nginx.monitoring.svc:80/api/v1/push
+    #     # tlsConfig:
+    #     #   insecureSkipVerify: true
+    #     headers:
+    #       X-Scope-OrgID: myk8s
+        
+    #     #! Basic Auth
+    #     basicAuth:
+    #       username:
+    #         name: p8s-mimir-basic-auth-username
+    #         key: bulmust
+    #       password:
+    #         name: p8s-mimir-basic-auth-password
+    #         key: bulmustbulmust
 
       #   # Pick up only specific metrics
       #   #* https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.RelabelConfig

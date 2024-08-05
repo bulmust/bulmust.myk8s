@@ -78,9 +78,9 @@ datasources:
     apiVersion: 1
     datasources:
     
-    # ##! Datasources - Mimir
-    # - name: Metrics_All
-    #   uid: metrics-all
+    # #! Datasources - Mimir
+    # - name: Mimir
+    #   uid: mimir
     #   type: prometheus
     #   access: proxy
     #   orgId: 1
@@ -93,6 +93,10 @@ datasources:
     #   secureJsonData:
     #     #* Do not put any spaces between | and the value
     #     httpHeaderValue1: myk8s|mimir-metamonitoring
+    #     #! Basic Auth
+    #     basicAuthPassword: bulmustbulmust
+    #   basicAuth: true
+    #   basicAuthUser: bulmust
     
     #! Data sources - Local Prometheus
     - name: Prometheus
@@ -103,6 +107,10 @@ datasources:
       url: http://p8s-stack-kube-prometheus-prometheus.monitoring.svc:9090
       editable: true
       isDefault: true
+      #! Basic Auth
+      basicAuth: true
+      basicAuthUser: bulmust
+      basicAuthPassword: bulmustbulmust
 
     #! Data sources - Loki
     - name: Loki
@@ -118,6 +126,10 @@ datasources:
         httpHeaderName1: "X-Scope-OrgID"
       secureJsonData:
         httpHeaderValue1: myk8s
+        #! Basic Auth
+        basicAuthPassword: bulmustbulmust
+      basicAuth: true
+      basicAuthUser: bulmust
     
     #! Data sources - Infinity
     #* https://grafana.com/docs/plugins/yesoreyeram-infinity-datasource/latest/setup/provisioning/

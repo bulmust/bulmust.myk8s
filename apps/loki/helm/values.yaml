@@ -159,17 +159,27 @@ gateway:
   ingress:
     enabled: true
     ingressClassName: nginx
-    # annotations:
-    #   cert-manager.io/cluster-issuer: local-ca-cert-issuer
-    #   cert-manager.io/cluster-issuer: letsencrypt-prod
-    #   acme.cert-manager.io/http01-edit-in-place: "true"
-    #   nginx.org/proxy-buffer-size: 8k
-    #   nginx.org/proxy-send-timeout: "600s"
-    #   nginx.org/proxy-read-timeout: "600s"
-    #   nginx.org/proxy-connect-timeout: "600s"
-    #   nginx.org/client-header-timeout: "600s"
-    #   nginx.org/client-body-timeout: "600s"
-    #   nginx.org/proxy-request-buffering: "off"
+    annotations:
+      #! Basic Auth Ingress
+      kubernetes.io/ingress.class: nginx
+      # type of authentication
+      nginx.ingress.kubernetes.io/auth-type: basic
+      # name of the secret that contains the user/password definitions
+      nginx.ingress.kubernetes.io/auth-secret: basic-auth
+      # message to display with an appropriate context why the authentication is required
+      nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+      # # Certificates
+      # cert-manager.io/cluster-issuer: local-ca-cert-issuer
+      # cert-manager.io/cluster-issuer: letsencrypt-prod
+      # acme.cert-manager.io/http01-edit-in-place: "true"
+      # # Nginx Config
+      # nginx.org/proxy-buffer-size: 8k
+      # nginx.org/proxy-send-timeout: "600s"
+      # nginx.org/proxy-read-timeout: "600s"
+      # nginx.org/proxy-connect-timeout: "600s"
+      # nginx.org/client-header-timeout: "600s"
+      # nginx.org/client-body-timeout: "600s"
+      # nginx.org/proxy-request-buffering: "off"
     hosts:
       - host: loki.localhost
         paths:
@@ -179,6 +189,14 @@ gateway:
       - secretName: loki-tls
         hosts:
           - loki.localhost
+  
+  #! Basic Auth
+  basicAuth:
+    enabled: true
+
+    ## Username Password
+    username: bulmust
+    password: bulmustbulmust
   # nginxConfig:
   #   serverSnippet: client_max_body_size 200M;
     #httpSnippet: client_max_body_size 200M;
