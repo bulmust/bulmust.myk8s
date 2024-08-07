@@ -1,0 +1,8 @@
+chartName: uptime-kuma
+repoURL: https://dirsigler.github.io/uptime-kuma-helm
+version: 2.19.3
+deployment:
+  name: uptime-kuma
+  namespace: monitoring
+  project: default
+  server: https://kubernetes.default.svc
