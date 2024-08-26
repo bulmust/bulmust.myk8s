@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: echo-ingress
+  namespace: test
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - echo.localhost
+    secretName: echo-localhost-tls
+  rules:
+  - host: echo.localhost
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: echo-service
+            port:
+              number: 80
