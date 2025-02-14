@@ -1,0 +1,8 @@
+chartName: minio
+repoURL: https://charts.bitnami.com/bitnami
+version: 14.1.7
+deployment:
+  name: minio
+  namespace: infra
+  project: default
+  server: https://kubernetes.default.svc

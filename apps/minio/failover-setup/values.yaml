@@ -1,0 +1,110 @@
+# global:
+#   imageRegistry: nexus-image.bordatech.com
+#   imagePullSecrets:
+#     - nexus
+mode: distributed
+auth:
+  rootUser: hia
+  rootPassword: BtttttttttYAYdL8djc8VYykt7
+provisioning:
+  enabled: true
+  resources:
+    requests:
+      cpu: 20m
+      memory: 30Mi
+    limits:
+      memory: 600Mi
+  policies:
+    - name: hia
+      statements:
+        - resources:
+            - "arn:aws:s3:::hia/*"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+  users:
+    - username: hia3
+      password: BtttttttttYAYdL8djc8VYykt3
+      policies:
+        - hia
+  buckets:
+    - name: hia
+  cleanupAfterFinished:
+    enabled: true
+    seconds: 60
+resources:
+  requests:
+    cpu: 20m
+    memory: 400Mi
+  limits:
+    memory: 3Gi
+ingress:
+  enabled: false
+  # ingressClassName: nginx
+  # hostname: minio-quattro.borda.hamadairport.com.qa
+  # annotations:
+  #   nginx.org/client-max-body-size: 400m
+  #   nginx.org/proxy-buffer-size: 8k
+  #   nginx.org/proxy-buffering: "false"
+  #   nginx.org/proxy-connect-timeout: 300s
+  #   nginx.org/websocket-services: minio
+  # tls: true
+apiIngress:
+  enabled: false
+  # ingressClassName: nginx
+  # hostname: minio-quattro.borda.hamadairport.com.qa
+  # annotations:
+  #   nginx.org/client-max-body-size: 400m
+  #   nginx.org/proxy-buffer-size: 8k
+  #   nginx.org/proxy-buffering: "false"
+  #   nginx.org/proxy-connect-timeout: 300s
+  #   nginx.org/websocket-services: minio
+  # tls: true
+persistence:
+  enabled: true
+  storageClass: standard #local-path
+  size: 10Gi
+metrics:
+  serviceMonitor:
+    enabled: false
+    # paths:
+    #   - /minio/v2/metrics/cluster
+    #   - /minio/v2/metrics/node
+    #   - /minio/v2/metrics/bucket
+    #   - /minio/v2/metrics/resource
+
+statefulset:
+  replicaCount: 4
+  zones: 1
+  drivesPerNode: 1
+
+affinity:
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+            - key: topology.kubernetes.io/region
+              operator: In
+              values:
+                - primary
+      - weight: 50
+        preference:
+          matchExpressions:
+            - key: topology.kubernetes.io/region
+              operator: In
+              values:
+                - failover
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - mongodb
+          topologyKey: topology.kubernetes.io/region
+nodeSelector:
+  role: infra
